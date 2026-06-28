@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>voy. - Gestión de Parqueaderos de Bicicletas</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Barra de Navegación Estilo Aplicación -->
+    <nav class="barra-navegacion">
+        <div class="marca-logo">🚴 voy<span>.</span></div>
+        <div class="enlaces-nav">
+            <a href="#">Inicio</a>
+            <a href="#">Ubicaciones</a>
+            <a href="#">Planes</a>
+            <button onclick="cerrarSesion()" id="btn-nav-logout" class="ocultar-seccion">Salir</button>
+        </div>
+    </nav>
+
+    <main class="contenedor-landing">
+        
+        <!-- SECCIÓN 1: LOGIN ESTILO START-UP -->
+        <div id="seccion-login" class="modulo-login-premium">
+            <div class="columna-texto-login">
+                <h1>Tu bici te mueve.<br>Nosotros <span class="texto-resaltado">la cuidamos.</span></h1>
+                <p>Parqueo seguro y accesible para que te muevas tranquilo por Medellín.</p>
+                <div class="decoracion-arboles">🌲🌳🌲</div>
+            </div>
+            <div class="columna-formulario-login">
+                <div class="tarjeta-autenticacion">
+                    <h2>🔐 Control de Acceso</h2>
+                    <label>Usuario Operario</label>
+                    <input type="text" id="login-usuario" placeholder="admin_usuario">
+                    
+                    <label>Contraseña</label>
+                    <input type="password" id="login-password" placeholder="••••••••">
+                    
+                    <button onclick="autenticarUsuario()" class="btn-principal">Acceder al Panel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: PANEL OPERATIVO DE ALTA GAMA -->
+        <div id="panel-sistema" class="ocultar-seccion">
+            <div class="hero-sistema">
+                <h1>Más bici, <span class="texto-resaltado">mejor ciudad.</span></h1>
+                <p>Panel de control operativo en tiempo real.</p>
+            </div>
+
+            <!-- Contador Redondeado Premium -->
+            <div class="tarjeta-contador-premium">
+                <p>Cupos Disponibles Actualmente</p>
+                <div id="contador-cupos" class="numero-cupos-premium">--</div>
+            </div>
+
+            <div class="grilla-operaciones-premium">
+                <!-- Tarjeta Entrada -->
+                <div class="tarjeta-accion-premium">
+                    <div class="icono-accion">📥</div>
+                    <h3>Registrar Ingreso</h3>
+                    <p>Asignación inmediata de celda segura.</p>
+                    <input type="text" id="doc-entrada" placeholder="Documento del ciclista">
+                    <button onclick="registrarOperacion('ingreso')" class="btn-principal">Confirmar Entrada</button>
+                </div>
+
+                <!-- Tarjeta Salida -->
+                <div class="tarjeta-accion-premium">
+                    <div class="icono-accion">📤</div>
+                    <h3>Registrar Salida</h3>
+                    <p>Liberación de cupo y cálculo de tiempo.</p>
+                    <input type="text" id="doc-salida" placeholder="Documento del ciclista">
+                    <button onclick="registrarOperacion('salida')" class="btn-principal btn-rojo-premium">Confirmar Salida</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

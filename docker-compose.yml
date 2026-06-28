@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  # Capa del Servidor (Python FastAPI)
+  backend:
+    image: python:3.10-slim
+    container_name: parqueadero_backend
+    volumes:
+      - ./backend:/app
+    working_dir: /app
+    ports:
+      - "8000:8000"
+    # Este comando instala FastAPI y enciende el servidor automáticamente
+    command: sh -c "pip install -r requirements.txt && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+
+  # Capa de la Pantalla Web (HTML/CSS/JS)
+  frontend:
+    image: nginx:alpine
+    container_name: parqueadero_frontend
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/usr/share/nginx/html

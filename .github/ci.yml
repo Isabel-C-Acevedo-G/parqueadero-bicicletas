@@ -1,0 +1,29 @@
+name: Validacion Automatizada - Parqueadero SENA
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  verificar_estructura:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar codigo del repositorio
+        uses: actions/checkout@v4
+
+      - name: Validar Pantalla de Inicio
+        run: test -f index.html
+
+      - name: Validar Estilos CSS
+        run: test -f css/style.css
+
+      - name: Validar Logica JavaScript
+        run: test -f js/script.js
+
+      # Nueva validación para tu profesor Efrén
+      - name: Validar Backend en Python FastAPI
+        run: |
+          test -f backend/main.py
+          test -f backend/requirements.txt
