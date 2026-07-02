@@ -1,0 +1,41 @@
+# Python files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local SQLite / DB files
+*.db
+*.sqlite3
+*.sqlite
+parqueadero_sena.db
+
+# Environment files
+.env
+.env.*
+
+# Docker
+docker-compose.override.yml
+*.log
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Node / frontend artifacts
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# System files
+*.swp
+*.swo
+
+# Ignore MySQL data volume if mounted locally
+mysql_data/

@@ -1,55 +1,58 @@
 :root {
-    --verde-brillante: #39A900;       /* Verde oficial SENA / Sostenible */
-    --verde-neon: #2ecc71;            /* Verde lima vibrante de los botones */
-    --azul-oscuro: #0f172a;           /* Fondo elegante de contraste */
-    --gris-suave: #f8fafc;            /* Fondo de la landing page */
-    --texto-oscuro: #1e293b;
-    --texto-mutado: #64748b;
-    --borde-curvo: 20px;              /* Curvatura estética de los botones de la imagen */
+    --verde-corporativo: #1b4d3e;     /* Verde oscuro y frondoso para todas las letras */
+    --verde-brillante: #39A900;       /* Verde vibrante para los botones principales */
+    --verde-neon: #2ecc71;            
+    --azul-oscuro: #0f172a;           
+    --gris-suave: rgba(255, 255, 255, 0.93); 
+    --borde-curvo: 24px;              
 }
 
 body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: var(--gris-suave);
-    color: var(--texto-oscuro);
-    overflow-x: hidden;
+    min-height: 100vh;
+    color: var(--verde-corporativo); /* Forzamos a que TODO el texto sea verde */
+    
+    /* CORRECCIÓN DE FONDO: Carga tu imagen local 'fondo.jpg' de forma garantizada */
+    background-image: 
+        linear-gradient(to bottom, rgba(240, 248, 240, 0.2), rgba(200, 230, 201, 0.35)),
+        url('./fondo.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
 }
 
-/* BARRA DE NAVEGACIÓN ESTILO APP */
+/* BARRA DE NAVEGACIÓN ESTILO APP EN VERDE */
 .barra-navegacion {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem 4rem;
-    background-color: white;
-    border-bottom: 1px solid #e2e8f0;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 3px solid var(--verde-brillante);
 }
 
 .marca-logo {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: 800;
-    color: var(--azul-oscuro);
+    color: var(--verde-corporativo); /* Nombre 'voy' en verde corporativo */
     letter-spacing: -1px;
 }
 
-.marca-logo span {
-    color: var(--verde-brillante);
-}
+.marca-logo span { color: var(--verde-brillante); }
 
 .enlaces-nav a {
     text-decoration: none;
-    color: var(--texto-mutated);
-    font-weight: 500;
+    color: var(--verde-corporativo); /* Enlaces del menú en verde corporativo */
+    font-weight: 700;
     margin-right: 2rem;
     font-size: 1rem;
-    transition: color 0.2s;
 }
 
-.enlaces-nav a:hover { color: var(--verde-brillante); }
-
-/* MAQUETACIÓN ESTILO LANDING PAGE (LOGIN) */
+/* MAQUETACIÓN DE 2 COLUMNAS AMPLIAS */
 .contenedor-landing {
     max-width: 1200px;
     margin: 4rem auto;
@@ -61,261 +64,99 @@ body {
     grid-template-columns: 1.2fr 0.8fr;
     gap: 4rem;
     align-items: center;
+    width: 100%;
 }
 
 .columna-texto-login h1 {
     font-size: 3.8rem;
     line-height: 1.1;
     font-weight: 800;
-    color: var(--azul-oscuro);
-    margin: 0 0 1.5rem 0;
-    letter-spacing: -2px;
+    color: var(--verde-corporativo); /* Título principal en verde corporativo */
+    margin: 0 0 1.7rem 0;
+    max-width: 600px;
+    font-weight: 800;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9) !important; 
 }
 
-.texto-resaltado {
-    color: var(--verde-brillante);
-    position: relative;
+
+.texto-resaltado { color: var(--verde-brillante); }
+
+/* 1. Unificar todo el título principal en verde oscuro */
+.texto-resaltado { 
+    color: var(--verde-corporativo) !important; 
 }
 
+/* 2. Cambiar el párrafo a blanco puro con sombra nítida */
 .columna-texto-login p {
-    font-size: 1.3rem;
-    color: var(--texto-mutado);
+    font-size: 1.5rem;
+    color: #ffffff !important; 
     line-height: 1.6;
     margin: 0 0 2rem 0;
     max-width: 500px;
+    font-weight: 600;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9) !important; 
 }
 
-.decoracion-arboles {
-    font-size: 3rem;
-    opacity: 0.8;
-    letter-spacing: 5px;
-}
 
-/* TARJETA DE AUTENTICACIÓN */
+/* TARJETA DE ACCESO LIMPIA */
 .tarjeta-autenticacion {
-    background: white;
+    background: var(--gris-suave);
+    backdrop-filter: blur(8px);
     padding: 3rem;
     border-radius: var(--borde-curvo);
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.06);
-    border: 1px solid #f1f5f9;
+    box-shadow: 0 20px 40px rgba(27, 77, 62, 0.12);
+    border: 1px solid rgba(57, 169, 0, 0.2);
 }
 
 .tarjeta-autenticacion h2 {
     margin-top: 0;
     font-size: 1.6rem;
-    color: var(--azul-oscuro);
+    color: var(--verde-corporativo); /* Letras de la tarjeta en verde corporativo */
     margin-bottom: 2rem;
+    font-weight: 800;
 }
 
 label {
     display: block;
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 0.5rem;
     font-size: 0.9rem;
-    color: var(--texto-oscuro);
+    color: var(--verde-corporativo); /* Subtítulos de campos en verde corporativo */
 }
 
 input {
     width: 100%;
     padding: 1rem;
     margin-bottom: 1.5rem;
-    border: 2px solid #e2e8f0;
+    border: 2px solid #cbd5e1;
     border-radius: 12px;
     box-sizing: border-box;
     font-size: 1rem;
-    transition: all 0.2s;
-    background-color: var(--gris-suave);
+    color: var(--verde-corporativo);
+    background-color: #f8fafc;
 }
 
-input:focus {
-    outline: none;
-    border-color: var(--verde-brillante);
-    background-color: white;
-    box-shadow: 0 0 0 4px rgba(57, 169, 0, 0.1);
-}
-
-/* BOTONES REDONDEADOS TIPO "VOY" */
+/* BOTÓN DE ACCESO */
 .btn-principal {
     width: 100%;
     background-color: var(--verde-brillante);
     color: white;
     padding: 1.1rem;
     border: none;
-    border-radius: 30px; /* Redondeado total como en la imagen */
+    border-radius: 30px;
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s;
     box-shadow: 0 4px 12px rgba(57, 169, 0, 0.2);
 }
 
-.btn-principal:hover {
-    background-color: #2e8600;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(57, 169, 0, 0.3);
-}
-
-/* --- ESTILOS DEL PANEL DE SISTEMA (PANTALLA OSCURA PREMIUM) --- */
-#panel-sistema {
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-.hero-sistema {
-    text-align: center;
-    margin-bottom: 3rem;
-}
-
-.hero-sistema h1 {
-    font-size: 3rem;
-    font-weight: 800;
-    color: var(--azul-oscuro);
-    margin: 0;
-}
-
-.tarjeta-contador-premium {
-    background-color: var(--azul-oscuro); /* Contraste oscuro del cuadrante superior derecho */
-    color: white;
-    text-align: center;
-    padding: 2.5rem;
-    border-radius: var(--borde-curvo);
-    max-width: 500px;
-    margin: 0 auto 3rem auto;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-}
-
-.tarjeta-contador-premium p {
-    margin: 0;
-    text-transform: uppercase;
-    font-weight: 600;
-    letter-spacing: 2px;
-    color: #94a3b8;
-    font-size: 0.9rem;
-}
-
-.numero-cupos-premium {
-    font-size: 5rem;
-    font-weight: 800;
-    color: var(--verde-neon); /* Resalta en verde brillante sobre el fondo oscuro */
-    margin-top: 0.5rem;
-}
-
-.grilla-operaciones-premium {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-}
-
-.tarjeta-accion-premium {
-    background: white;
-    padding: 3rem;
-    border-radius: var(--borde-curvo);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.03);
-    border: 1px solid #f1f5f9;
-}
-
-.icono-accion { font-size: 2.5rem; margin-bottom: 1rem; }
-.tarjeta-accion-premium h3 { margin: 0 0 0.5rem 0; font-size: 1.4rem; color: var(--azul-oscuro); }
-.tarjeta-accion-premium p { margin: 0 0 2rem 0; color: var(--texto-mutado); }
-
-.btn-rojo-premium {
-    background-color: #e2e8f0;
-    color: var(--texto-oscuro);
-    box-shadow: none;
-}
-
-.btn-rojo-premium:hover {
-    background-color: #cbd5e1;
-    color: var(--texto-oscuro);
-    box-shadow: none;
-}
-
-/* UTILIDADES */
+/* PANEL INTERNO */
+.hero-sistema h1 { font-size: 3rem; font-weight: 800; color: var(--verde-corporativo); }
+.hero-sistema p { color: var(--verde-corporativo); font-weight: 600; }
+.tarjeta-contador-premium { background-color: var(--azul-oscuro); color: white; text-align: center; padding: 2.5rem; border-radius: var(--borde-curvo); max-width: 500px; margin: 0 auto 3rem auto; }
+.numero-cupos-premium { font-size: 5rem; font-weight: 800; color: var(--verde-neon); }
+.grilla-operaciones-premium { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+.tarjeta-accion-premium { background: var(--gris-suave); backdrop-filter: blur(8px); padding: 3rem; border-radius: var(--borde-curvo); border: 1px solid #e2e8f0; }
+.tarjeta-accion-premium h3 { color: var(--verde-corporativo); font-weight: 800; }
+.btn-rojo-premium { background-color: #e2e8f0; color: var(--verde-corporativo); }
 .ocultar-seccion { display: none !important; }
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-/* ==========================================================================
-   MÓDULO RESPONSIVE: ADAPTACIÓN AUTOMÁTICA PARA CELULARES Y TABLETAS
-   ========================================================================== */
-@media (max-width: 968px) {
-    /* Barra de navegación adaptable */
-    .barra-navegacion {
-        padding: 1.2rem 2rem;
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-    }
-    
-    .enlaces-nav {
-        display: flex;
-        gap: 1rem;
-        margin-top: 0.5rem;
-    }
-    
-    .enlaces-nav a {
-        margin-right: 0;
-        font-size: 0.95rem;
-    }
-
-    /* Transformación del Login de 2 columnas a 1 sola columna vertical */
-    .modulo-login-premium {
-        grid-template-columns: 1fr;
-        gap: 2.5rem;
-        margin: 2rem auto;
-        text-align: center;
-    }
-
-    .columna-texto-login h1 {
-        font-size: 2.5rem; /* Letra más cómoda para pantallas de celular */
-        letter-spacing: -1px;
-    }
-
-    .columna-texto-login p {
-        margin: 0 auto 1.5rem auto;
-        font-size: 1.1rem;
-    }
-
-    .decoracion-arboles {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .tarjeta-autenticacion {
-        padding: 2rem; /* Menos espacio interno en celulares para ganar pantalla */
-    }
-
-    /* Transformación del Panel Operativo a 1 sola columna */
-    .grilla-operaciones-premium {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-
-    .hero-sistema h1 {
-        font-size: 2.2rem;
-    }
-
-    .tarjeta-contador-premium {
-        padding: 1.8rem;
-    }
-
-    .numero-cupos-premium {
-        font-size: 3.8rem;
-    }
-
-    .tarjeta-accion-premium {
-        padding: 2rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .columna-texto-login h1 {
-        font-size: 2rem;
-    }
-    
-    .contenedor-landing {
-        padding: 0 1rem;
-        margin: 2rem auto;
-    }
-}

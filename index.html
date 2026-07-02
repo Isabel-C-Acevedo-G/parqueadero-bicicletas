@@ -11,66 +11,133 @@
     <nav class="barra-navegacion">
         <div class="marca-logo">🚴 voy<span>.</span></div>
         <div class="enlaces-nav">
-            <a href="#">Inicio</a>
-            <a href="#">Ubicaciones</a>
-            <a href="#">Planes</a>
+            <a href="javascript:void(0)" onclick="mostrarInicio(event)">Inicio</a>
+            <a href="javascript:void(0)" onclick="mostrarUbicaciones(event)">Ubicaciones</a>
+            <a href="javascript:void(0)" onclick="mostrarPlanes(event)">Planes</a>
+            <a href="javascript:void(0)" onclick="mostrarRegistro(event)">Registro</a>
+
             <button onclick="cerrarSesion()" id="btn-nav-logout" class="ocultar-seccion">Salir</button>
         </div>
     </nav>
 
     <main class="contenedor-landing">
         
-        <!-- SECCIÓN 1: LOGIN ESTILO START-UP -->
+        <!-- SECCIÓN 1: LOGIN ESTILO START-UP ORIGINAL (SIN ARBOLITOS VIEJOS) -->
         <div id="seccion-login" class="modulo-login-premium">
             <div class="columna-texto-login">
                 <h1>Tu bici te mueve.<br>Nosotros <span class="texto-resaltado">la cuidamos.</span></h1>
-                <p>Parqueo seguro y accesible para que te muevas tranquilo por Medellín.</p>
-                <div class="decoracion-arboles">🌲🌳🌲</div>
+                <p>Parqueo de bicicletas seguro, comodo, contribuye a una ciudad mas limpia y sostenible.</p>
             </div>
             <div class="columna-formulario-login">
                 <div class="tarjeta-autenticacion">
                     <h2>🔐 Control de Acceso</h2>
-                    <label>Usuario Operario</label>
+                    <label>Usuario / Correo</label>
                     <input type="text" id="login-usuario" placeholder="admin_usuario">
                     
                     <label>Contraseña</label>
                     <input type="password" id="login-password" placeholder="••••••••">
                     
                     <button onclick="autenticarUsuario()" class="btn-principal">Acceder al Panel</button>
+                    <p class="texto-pequeno" style="margin-top:1rem; font-size:0.9rem; color:#ffffff;">¿No tienes cuenta? <a href="javascript:void(0)" onclick="mostrarRegistro(event)" style="color:#fde68a;">Regístrate aquí</a></p>
                 </div>
+
             </div>
         </div>
 
-        <!-- SECCIÓN 2: PANEL OPERATIVO DE ALTA GAMA -->
+        <div id="seccion-registro" class="tarjeta-autenticacion ocultar-seccion" style="margin: 2rem auto; max-width: 640px;">
+            <h2>📝 Registro de Usuario</h2>
+
+            <label>Documento</label>
+            <input type="text" id="registro-documento" placeholder="Ej: 12345678">
+
+            <label>Nombres</label>
+            <input type="text" id="registro-nombres" placeholder="Ej: Isabel Cristina">
+
+            <label>Apellidos</label>
+            <input type="text" id="registro-apellidos" placeholder="Ej: Acevedo Guirales">
+
+            <label>Correo</label>
+            <input type="email" id="registro-correo" placeholder="Ej: correo@dominio.com">
+
+            <label>Teléfono</label>
+            <input type="text" id="registro-telefono" placeholder="Ej: 3226753558">
+
+            <label>Contraseña</label>
+            <input type="password" id="registro-password" placeholder="••••••••">
+
+            <input type="hidden" id="registro-rol" value="Ciclista">
+
+            <button onclick="registrarUsuario()" class="btn-principal">Crear cuenta</button>
+            <button onclick="mostrarLogin(event)" class="btn-secundario" style="margin-top:0.75rem;">Volver al inicio</button>
+        </div>
+
+        <!-- SECCIÓN 2: UBICACIONES -->
+        <div id="seccion-ubicaciones" class="tarjeta-autenticacion ocultar-seccion" style="margin-top:1.5rem;">
+            <h2>📍 Ubicaciones</h2>
+            <p>Selecciona el punto más cercano para tu parqueadero de bicicleta.</p>
+            <ul>
+                <li>Parqueadero 1 - Centro Comercial</li>
+                <li>Parqueadero 2 - Estación de Metro</li>
+                <li>Parqueadero 3 - Universidad</li>
+            </ul>
+            <button onclick="mostrarInicio()" class="btn-secundario" style="margin-top:0.75rem;">Volver al inicio</button>
+        </div>
+
+        <!-- SECCIÓN 3: PLANES -->
+        <div id="seccion-planes" class="tarjeta-autenticacion ocultar-seccion" style="margin-top:1.5rem;">
+            <h2>💳 Planes</h2>
+            <p>Revisa las opciones disponibles para el uso de parqueaderos.</p>
+            <ul>
+                <li>Plan Diario - Acceso por 24 horas</li>
+                <li>Plan Mensual - Uso ilimitado durante un mes</li>
+                <li>Plan Corporativo - Para empresas y grupos</li>
+            </ul>
+            <button onclick="mostrarInicio()" class="btn-secundario" style="margin-top:0.75rem;">Volver al inicio</button>
+        </div>
+
+        <!-- SECCIÓN 4: PANEL OPERATIVO MULTI-ROL (CONTRATE VERDE) -->
         <div id="panel-sistema" class="ocultar-seccion">
             <div class="hero-sistema">
-                <h1>Más bici, <span class="texto-resaltado">mejor ciudad.</span></h1>
-                <p>Panel de control operativo en tiempo real.</p>
+                <h1 id="saludo-rol">Panel de Control</h1>
+                <p>Monitoreo operativo e infraestructura de celdas relacionales en tiempo real.</p>
             </div>
 
-            <!-- Contador Redondeado Premium -->
+            <!-- Consulta de Disponibilidad de Celdas -->
             <div class="tarjeta-contador-premium">
                 <p>Cupos Disponibles Actualmente</p>
                 <div id="contador-cupos" class="numero-cupos-premium">--</div>
             </div>
 
             <div class="grilla-operaciones-premium">
-                <!-- Tarjeta Entrada -->
-                <div class="tarjeta-accion-premium">
-                    <div class="icono-accion">📥</div>
-                    <h3>Registrar Ingreso</h3>
-                    <p>Asignación inmediata de celda segura.</p>
-                    <input type="text" id="doc-entrada" placeholder="Documento del ciclista">
-                    <button onclick="registrarOperacion('ingreso')" class="btn-principal">Confirmar Entrada</button>
+                <!-- Módulo de Gestión Operativa -->
+                <div id="bloque-gestion-operario" class="tarjeta-accion-premium">
+                    <h3>🛠️ Registro de Movimientos</h3>
+                    <p>Gestión de ingresos y liberación de celdas físicas.</p>
+                    
+                    <label>Cédula del Ciclista / ID Bici</label>
+                    <input type="text" id="doc-movimiento" placeholder="Ej: 1017200XXX">
+                    
+                    <label>Código de Celda / Espacio (Solo para Ingresos)</label>
+                    <input type="text" id="espacio-movimiento" placeholder="Ej: Celda-05">
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <button onclick="procesarMovimiento('ingreso')" class="btn-principal">Registrar Entrada</button>
+                        <button onclick="procesarMovimiento('salida')" class="btn-principal btn-rojo-premium">Registrar Salida</button>
+                    </div>
                 </div>
 
-                <!-- Tarjeta Salida -->
+                <!-- Módulo Reporte de Incidentes -->
                 <div class="tarjeta-accion-premium">
-                    <div class="icono-accion">📤</div>
-                    <h3>Registrar Salida</h3>
-                    <p>Liberación de cupo y cálculo de tiempo.</p>
-                    <input type="text" id="doc-salida" placeholder="Documento del ciclista">
-                    <button onclick="registrarOperacion('salida')" class="btn-principal btn-rojo-premium">Confirmar Salida</button>
+                    <h3>⚠️ Reporte de Novedades e Incidentes</h3>
+                    <p>Registro de anomalías o daños en las bicicletas para auditoría administrativa.</p>
+                    
+                    <label>Código de Bicicleta Afectada</label>
+                    <input type="text" id="incidente-bici" placeholder="Ej: BICI-99">
+                    
+                    <label>Descripción de la Novedad</label>
+                    <input type="text" id="incidente-descripcion" placeholder="Ej: Cadena suelta o rayón lateral">
+                    
+                    <button onclick="registrarIncidente()" class="btn-principal" style="background-color: #27ae60;">Reportar Incidente</button>
                 </div>
             </div>
         </div>

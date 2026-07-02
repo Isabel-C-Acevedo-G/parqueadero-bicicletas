@@ -1,23 +1,45 @@
-version: '3.8'
-
 services:
-  # Capa del Servidor (Python FastAPI)
+  mysql:
+    image: mysql:8.0
+    container_name: voy_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ParqueaderoBicicletas
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   backend:
-    image: python:3.10-slim
-    container_name: parqueadero_backend
+    build: ./backend
+    container_name: voy_backend
+    depends_on:
+      - mysql
     volumes:
       - ./backend:/app
-    working_dir: /app
     ports:
       - "8000:8000"
-    # Este comando instala FastAPI y enciende el servidor automáticamente
-    command: sh -c "pip install -r requirements.txt && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    environment:
+      - DB_SERVER=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=ParqueaderoBicicletas
+      - DB_UID=root
+      - DB_PWD=root
 
-  # Capa de la Pantalla Web (HTML/CSS/JS)
   frontend:
     image: nginx:alpine
-    container_name: parqueadero_frontend
+    container_name: voy_frontend
     ports:
       - "8080:80"
     volumes:
       - .:/usr/share/nginx/html
+
+volumes:
+  mysql_data:

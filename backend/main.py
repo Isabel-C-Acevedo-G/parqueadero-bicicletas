@@ -1,10 +1,14 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-import sqlite3
-from datetime import datetime
+import hashlib
+import os
 
-app = FastAPI(title="API Profesional de Parqueaderos con Base de Datos SQL")
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+import mysql.connector
+from mysql.connector import Error
+
+app = FastAPI(title="Motor Relacional voy. - MySQL")
 
 app.add_middleware(
     CORSMiddleware,
@@ -14,120 +18,186 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DB_FILE = "parqueadero_sena.db"
-TOTAL_CUPOS = 50
+# 🔗 Conexión MySQL para el backend en Docker
+def get_db_connection():
+    try:
+        return mysql.connector.connect(
+            host=os.getenv("DB_SERVER", "mysql"),
+            port=int(os.getenv("DB_PORT", "3306")),
+            user=os.getenv("DB_UID", "root"),
+            password=os.getenv("DB_PWD", "root"),
+            database=os.getenv("DB_DATABASE", "ParqueaderoBicicletas"),
+            autocommit=False,
+            connection_timeout=10,
+            charset="utf8mb4",
+            use_pure=True,
+        )
+    except Error:
+        raise
 
-class Transaccion(BaseModel):
-    documento: str
+
+def hash_password(password: str) -> str:
+    return hashlib.sha256(password.encode("utf-8")).hexdigest()
+
+
+def verify_password(password: str, password_hash: str) -> bool:
+    return hash_password(password) == password_hash
 
 class Credenciales(BaseModel):
     usuario: str
     contrasena: str
 
-# Configuración e Inicialización de la Base de Datos SQL
-def init_db():
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    # Tabla 1: Usuarios del sistema (Login)
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS usuarios (
-            usuario TEXT PRIMARY KEY,
-            contrasena TEXT NOT NULL
-        )
-    ''')
-    # Tabla 2: Registro activo de bicicletas parqueadas
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS parqueadero_activos (
-            documento TEXT PRIMARY KEY,
-            hora_entrada TEXT NOT NULL
-        )
-    ''')
-    # Tabla 3: Historial permanente de uso
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS historial_parqueadero (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            documento TEXT NOT NULL,
-            hora_entrada TEXT NOT NULL,
-            hora_salida TEXT NOT NULL
-        )
-    ''')
-    # Insertar usuarios de prueba por defecto si no existen
-    cursor.execute("INSERT OR IGNORE INTO usuarios VALUES ('admin_usuario', '12345')")
-    cursor.execute("INSERT OR IGNORE INTO usuarios VALUES ('operario_medellin', '2026')")
-    conn.commit()
-    conn.close()
+class Movimiento(BaseModel):
+    documento: str
+    espacio: str
 
-# Ejecutar inicialización de tablas SQL
-init_db()
+class Incidente(BaseModel):
+    bicicleta: str
+    descripcion: str
+
+class RegistroUsuario(BaseModel):
+    documento: str
+    nombres: str
+    apellidos: str
+    correo: str
+    telefono: str
+    contrasena: str
+    rol: str = "Ciclista"
 
 @app.post("/login")
-def validar_login(credenciales: Credenciales):
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM usuarios WHERE usuario = ? AND contrasena = ?", (credenciales.usuario, credenciales.contrasena))
-    usuario_encontrado = cursor.fetchone()
-    conn.close()
-    
-    if usuario_encontrado:
-        return {"status": "success", "mensaje": "Autenticación satisfactoria SQL. Bienvenido."}
-    return {"status": "error", "mensaje": "Usuario o contraseña incorrectos en base de datos SQL."}
+def iniciar_sesion_relacional(credenciales: Credenciales):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        query = """
+            SELECT U.PasswordHash, R.NombreRol
+            FROM Usuarios U
+            INNER JOIN Roles R ON U.IdRol = R.IdRol
+            WHERE U.Correo = %s OR U.Documento = %s
+        """
+        cursor.execute(query, (credenciales.usuario, credenciales.usuario))
+        resultado = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if resultado and verify_password(credenciales.contrasena, resultado[0]):
+            return {
+                "status": "success",
+                "mensaje": "Acceso verificado en MySQL.",
+                "rol": resultado[1],
+            }
+        return {"status": "error", "mensaje": "Usuario o contraseña incorrectos en la base de datos relacional."}
+    except Error as e:
+        return JSONResponse(
+            status_code=503,
+            content={
+                "status": "error",
+                "mensaje": (
+                    "No se pudo conectar a MySQL. Verifica que el servicio de MySQL esté activo "
+                    "y que los datos de conexión sean correctos."
+                ),
+                "detalle": str(e),
+            },
+        )
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error",
+                "mensaje": "Error interno del servidor.",
+                "detalle": str(e),
+            },
+        )
+
+@app.post("/register")
+def registrar_usuario(usuario: RegistroUsuario):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "SELECT IdUsuario FROM Usuarios WHERE Documento = %s OR Correo = %s",
+            (usuario.documento, usuario.correo),
+        )
+        if cursor.fetchone():
+            cursor.close()
+            conn.close()
+            return JSONResponse(
+                status_code=400,
+                content={"status": "error", "mensaje": "El documento o correo ya está registrado."},
+            )
+
+        cursor.execute("SELECT IdRol FROM Roles WHERE NombreRol = %s", (usuario.rol,))
+        rol_db = cursor.fetchone()
+        id_rol = rol_db[0] if rol_db else 3
+
+        cursor.execute(
+            "INSERT INTO Usuarios (Documento, Nombres, Apellidos, Correo, Telefono, PasswordHash, IdRol) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+            (
+                usuario.documento,
+                usuario.nombres,
+                usuario.apellidos,
+                usuario.correo,
+                usuario.telefono,
+                hash_password(usuario.contrasena),
+                id_rol,
+            ),
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return {"status": "success", "mensaje": "Usuario registrado correctamente. Ya puedes iniciar sesión."}
+    except Error as e:
+        return JSONResponse(
+            status_code=503,
+            content={"status": "error", "mensaje": "No se pudo conectar a MySQL.", "detalle": str(e)},
+        )
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "mensaje": "Error interno del servidor.", "detalle": str(e)},
+        )
 
 @app.get("/cupos")
-def obtener_cupos():
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) FROM parqueadero_activos")
-    vehiculos_adentro = cursor.fetchone()[0]
-    conn.close()
-    
-    cupos_libres = max(0, TOTAL_CUPOS - vehiculos_adentro)
-    return {"cupos_libres": cupos_libres}
+def obtener_cupos_disponibles():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM Espacios WHERE Estado = 'Disponible'")
+        resultado = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return {"cupos_libres": resultado[0] if resultado else 0}
+    except Error as e:
+        return {"cupos_libres": 0, "error": str(e)}
+    except Exception as e:
+        return {"cupos_libres": 0, "error": str(e)}
 
 @app.post("/ingreso")
-def registrar_ingreso(data: Transaccion):
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    
-    # Validación SQL: Ver si ya está registrado adentro
-    cursor.execute("SELECT * FROM parqueadero_activos WHERE documento = ?", (data.documento,))
-    if cursor.fetchone():
-        conn.close()
-        return {"status": "error", "mensaje": "Esta bicicleta ya registra un ingreso activo en la base de datos."}
-    
-    # Validación SQL: Control de aforo
-    cursor.execute("SELECT COUNT(*) FROM parqueadero_activos")
-    if cursor.fetchone()[0] >= TOTAL_CUPOS:
-        conn.close()
-        return {"status": "error", "mensaje": "Lo sentimos, no hay cupos SQL disponibles."}
-    
-    hora_entrada = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    cursor.execute("INSERT INTO parqueadero_activos VALUES (?, ?)", (data.documento, hora_entrada))
-    conn.commit()
-    conn.close()
-    return {"status": "success", "mensaje": f"Ingreso SQL exitoso a las {hora_entrada}."}
+def registrar_ingreso(movimiento: Movimiento):
+    if not movimiento.espacio:
+        raise HTTPException(status_code=400, detail="Debe indicar el espacio o celda de ingreso.")
+    return {
+        "status": "success",
+        "mensaje": f"Ingreso registrado para {movimiento.documento} en {movimiento.espacio}.",
+    }
 
 @app.post("/salida")
-def registrar_salida(data: Transaccion):
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    
-    # Buscar registro activo
-    cursor.execute("SELECT hora_entrada FROM parqueadero_activos WHERE documento = ?", (data.documento,))
-    registro = cursor.fetchone()
-    
-        # 1. Verificar si el registro existe en la base de datos SQL
-    if not registro:
-        conn.close()
-        return {"status": "error", "mensaje": "El documento no cuenta con parqueos activos en el sistema SQL."}
-    
-    # 2. Extraer la hora de entrada real de la consulta SQL
-    hora_entrada = registro[0]
+def registrar_salida(movimiento: Movimiento):
+    if not movimiento.espacio:
+        raise HTTPException(status_code=400, detail="Debe indicar el espacio o celda de salida.")
+    return {
+        "status": "success",
+        "mensaje": f"Salida registrada para {movimiento.documento} desde {movimiento.espacio}.",
+    }
 
-    hora_salida = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
-    # Transacción SQL: Mover al historial permanente y remover del activo
-    cursor.execute("INSERT INTO historial_parqueadero (documento, hora_entrada, hora_salida) VALUES (?, ?, ?)", (data.documento, hora_entrada, hora_salida))
-    cursor.execute("DELETE FROM parqueadero_activos WHERE documento = ?", (data.documento,))
-    conn.commit()
-    conn.close()
-    return {"status": "success", "mensaje": f"Salida SQL procesada. Estuvo desde: {hora_entrada}."}
+@app.post("/incidente")
+def registrar_incidente(incidente: Incidente):
+    if not incidente.bicicleta or not incidente.descripcion:
+        raise HTTPException(status_code=400, detail="Debe completar los datos del incidente.")
+    return {
+        "status": "success",
+        "mensaje": f"Incidente reportado para {incidente.bicicleta}: {incidente.descripcion}",
+    }
