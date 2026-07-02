@@ -1,0 +1,27 @@
+name: Validacion Estructural - voy.
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  verificar_proyecto:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar codigo del repositorio
+        uses: actions/checkout@v4
+
+      - name: Verificar Interfaz Web
+        run: test -f index.html
+
+      - name: Verificar Estilos Modulares
+        run: test -f css/style.css
+
+      - name: Verificar Controladores Cliente
+        run: test -f js/script.js
+
+      - name: Verificar Entorno Backend
+        run: |
+          test -f backend/main.py
+          test -f backend/requirements.txt
